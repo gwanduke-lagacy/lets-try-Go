@@ -160,16 +160,36 @@ func temperature(city string, providers ...weatherProvider) (float64, error) {
 type multiWeatherProvider []weatherProvider
 
 func (w multiWeatherProvider) temperature(city string) (float64, error) {
-	sum := 0.0
+	// 온도를 위한 채널과 에러를 위한 채널을 만든다
+	// 각 provider는 오직 하나로 푸쉬 할 것이다.
+	temps := make(chan float64, len(w))
+	errs := make(chan error, len(w))
 
+	// 각 provider는 익명함수와 함께 고루틴을 일어나게 하기위해
+	// 그 함수는 온도 메서드를 호출할 것이며 응답을 포워딩 할 것이다.
 	for _, provider := range w {
-		k, err := provider.temperature(city)
-		if err != nil {
-			return 0, err
-		}
-
-		sum += k
+		go func(p weatherProvider) {
+			k, err := p.temperature(city)
+			if err != nil {
+				errs <- err
+				return
+			}
+			temps <- k
+		}(provider)
 	}
 
+	sum := 0.0
+
+	// 온도를 수집하거나 각 provider로 부터 에러를 수집한다.
+	for i := 0; i < len(w); i++ {
+		select {
+		case temp := <-temps:
+			sum += temp
+		case err := <-errs:
+			return 0, err
+		}
+	}
+
+	// 평균을 리턴, 이전과 같이
 	return sum / float64(len(w)), nil
 }
