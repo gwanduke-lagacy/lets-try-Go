@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -42,7 +44,8 @@ func main() {
 	// type Handler interface {
 	//   ServeHTTP(ResponseWriter, *Request)
 	// }
-	http.Handle("/", new(testHandler))
+	// http.Handle("/", new(testHandler))
+	http.Handle("/", http.FileServer(http.Dir("public")))
 
 	// 지정된 포트에 웹서버를 열고 클라이언트 Request를 받아들여 새 Go루틴에 작업 할당
 	// ListenAndServe(:포트, ServeMux(default: DefaultServeMux))
@@ -50,6 +53,46 @@ func main() {
 	// 개발자가 별도로 지정하여 라우팅 제어 가능하다.
 	// 기본값을 사용할 경우 Handle(), HandleFunc() 사용해 라우팅 패턴 추가
 	http.ListenAndServe(":8080", nil)
+}
+
+type staticHandler struct {
+	http.Handler
+}
+
+func (h *staticHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	localPath := "wwwroot" + req.URL.Path
+	content, err := ioutil.ReadFile(localPath)
+	if err != nil {
+		w.WriteHeader(404)
+		w.Write([]byte(http.StatusText(404)))
+		return
+	}
+
+	contentType := getContentType(localPath)
+	w.Header().Add("Content-Type", contentType)
+	w.Write(content)
+}
+
+func getContentType(localPath string) string {
+	var contentType string
+	ext := filepath.Ext(localPath)
+
+	switch ext {
+	case ".html":
+		contentType = "text/html"
+	case ".css":
+		contentType = "text/css"
+	case ".js":
+		contentType = "application/javascript"
+	case ".png":
+		contentType = "image/png"
+	case ".jpg":
+		contentType = "image/jpeg"
+	default:
+		contentType = "text/plain"
+	}
+
+	return contentType
 }
 
 type testHandler struct {
