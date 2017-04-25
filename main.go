@@ -32,9 +32,37 @@ func main() {
 		})
 	})
 
+	// 라우팅: 요청된 Request Path에 어떤 Request 핸들러를 사용할지 지정
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("안녕하세요"))
+	})
+
+	// 테스트 핸들러
+	// Handle(path, Handler)
+	// type Handler interface {
+	//   ServeHTTP(ResponseWriter, *Request)
+	// }
+	http.Handle("/", new(testHandler))
+
+	// 지정된 포트에 웹서버를 열고 클라이언트 Request를 받아들여 새 Go루틴에 작업 할당
+	// ListenAndServe(:포트, ServeMux(default: DefaultServeMux))
+	// ServeMux는 기본적으로 HTTP Request Router 혹은 Multiplexor 인데,
+	// 개발자가 별도로 지정하여 라우팅 제어 가능하다.
+	// 기본값을 사용할 경우 Handle(), HandleFunc() 사용해 라우팅 패턴 추가
 	http.ListenAndServe(":8080", nil)
 }
 
+type testHandler struct {
+	http.Handler
+}
+
+func (h *testHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	str := "Your Request Path is " + req.URL.Path
+	w.Write([]byte(str))
+}
+
+// http.ResponseWriter: HTTP Response에 내용 작성
+// http.Request: 입력된 Request 요청을 검토
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello!"))
 }
