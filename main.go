@@ -34,13 +34,16 @@ func main() {
 	myFileLogger = log.New(fpLog, "MY_FILE_LOGGER: ", log.Ldate|log.Ltime|log.Lshortfile)
 	myStdLogger = log.New(os.Stdout, "STANDARD_LOGGER: ", log.LstdFlags)
 
-	mw := multiWeatherProvider{
+	// Prepare
+	mwp := multiWeatherProvider{
 		openWeatherMap{},
 		weatherUnderground{apiKey: "964f63783709f6d0"},
 	}
 
-	http.HandleFunc("/post_test", func(w http.ResponseWriter, r *http.Request) {
 	WriteDoubleLogging(fpLog, "라우팅 시작")
+
+	// 라우팅: 요청된 Request Path에 어떤 Request 핸들러를 사용할지 지정
+	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
 			myFileLogger.Println("GET 요청이 호출 되었습니다.")
@@ -48,8 +51,8 @@ func main() {
 			// log.SetFlags(0)
 			log.Println("GET 요청이 호출 되었습니다. (표준 로거)")
 
-			gwanduke := Person{"Kim Gwan-duk", 28, 182, 79}
-			jsonBytes, err := json.Marshal(gwanduke)
+			person := Person{"gwanduke", 28, 182, 79}
+			jsonBytes, err := json.Marshal(person)
 
 			if err != nil {
 				panic(err)
@@ -60,21 +63,20 @@ func main() {
 			w.Write([]byte(jsonString))
 		case "POST":
 			var person Person
-			err := json.Unmarshal([]byte("{\"name\":\"gwanduke\"}"), &person)
+			jsonString := []byte("{\"name\":\"gwanduke\", \"age\":28, \"height\": 182, \"weight\": 73}")
+			err := json.Unmarshal(jsonString, &person)
 
 			if err != nil {
 				panic(err)
 			}
 
-
+			jsonBytes, err := json.Marshal(person)
 			w.Header().Add("Content-Type", "application/text")
-			w.Write([]byte(person.Name))
-		case "PUT":
-			// Update an existing record.
-		case "DELETE":
-			// Remove the record.
+			w.Write([]byte(string(jsonBytes)))
+		// case "PUT":
+		// case "DELETE":
 		default:
-			// Give an error message.
+			w.Write([]byte("Not Found"))
 		}
 	})
 
@@ -82,7 +84,7 @@ func main() {
 		begin := time.Now()
 		city := strings.SplitN(r.URL.Path, "/", 3)[2]
 
-		temp, err := mw.temperature(city)
+		temp, err := mwp.temperature(city)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -94,11 +96,6 @@ func main() {
 			"temp": temp,
 			"took": time.Since(begin).String(),
 		})
-	})
-
-	// 라우팅: 요청된 Request Path에 어떤 Request 핸들러를 사용할지 지정
-	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("안녕하세요"))
 	})
 
 	// 테스트 핸들러
