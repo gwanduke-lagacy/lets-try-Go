@@ -5,21 +5,31 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func main() {
-	http.HandleFunc("/", hello)
+	mw := multiWeatherProvider{
+		openWeatherMap{},
+		weatherUnderground{apiKey: "964f63783709f6d0"},
+	}
+
 	http.HandleFunc("/weather/", func(w http.ResponseWriter, r *http.Request) {
+		begin := time.Now()
 		city := strings.SplitN(r.URL.Path, "/", 3)[2]
 
-		data, err := query(city)
+		temp, err := mw.temperature(city)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		json.NewEncoder(w).Encode(data)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"city": city,
+			"temp": temp,
+			"took": time.Since(begin).String(),
+		})
 	})
 
 	http.ListenAndServe(":8080", nil)
@@ -83,7 +93,7 @@ type weatherProvider interface {
 type openWeatherMap struct{}
 
 func (w openWeatherMap) temperature(city string) (float64, error) {
-	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?APPID=YOUR_API_KEY&q=" + city)
+	resp, err := http.Get("http://api.openweathermap.org/data/2.5/weather?APPID=ec7d4673c2832ea731212b751d9f0896&q=" + city)
 	if err != nil {
 		return 0, err
 	}
@@ -130,4 +140,36 @@ func (w weatherUnderground) temperature(city string) (float64, error) {
 	log.Printf("weatherUnderground: %s: %.2f", city, kelvin)
 
 	return kelvin, nil
+}
+
+func temperature(city string, providers ...weatherProvider) (float64, error) {
+	sum := 0.0
+
+	for _, provider := range providers {
+		k, err := provider.temperature(city)
+		if err != nil {
+			return 0, err
+		}
+
+		sum += k
+	}
+
+	return sum / float64(len(providers)), nil
+}
+
+type multiWeatherProvider []weatherProvider
+
+func (w multiWeatherProvider) temperature(city string) (float64, error) {
+	sum := 0.0
+
+	for _, provider := range w {
+		k, err := provider.temperature(city)
+		if err != nil {
+			return 0, err
+		}
+
+		sum += k
+	}
+
+	return sum / float64(len(w)), nil
 }
