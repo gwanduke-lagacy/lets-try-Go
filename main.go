@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -23,6 +24,7 @@ var myLogger *log.Logger
 var myFileLogger *log.Logger
 
 func main() {
+
 	fpLog, err := os.OpenFile("gwanduke_log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
@@ -107,6 +109,11 @@ func main() {
 	// }
 	// http.Handle("/", new(testHandler))
 	http.Handle("/", http.FileServer(http.Dir("public")))
+
+	// 다중 로깅
+	multiWriter := io.MultiWriter(fpLog, os.Stdout)
+	log.SetOutput(multiWriter)
+	log.Println("---------- End of main ----------")
 
 	// 지정된 포트에 웹서버를 열고 클라이언트 Request를 받아들여 새 Go루틴에 작업 할당
 	// ListenAndServe(:포트, ServeMux(default: DefaultServeMux))
