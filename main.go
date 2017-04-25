@@ -10,11 +10,52 @@ import (
 	"time"
 )
 
+// Person 사람
+type Person struct {
+	Name   string
+	Age    int
+	Height int
+	Weight float64
+}
+
 func main() {
 	mw := multiWeatherProvider{
 		openWeatherMap{},
 		weatherUnderground{apiKey: "964f63783709f6d0"},
 	}
+
+	http.HandleFunc("/post_test", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case "GET":
+			gwanduke := Person{"Kim Gwan-duk", 28, 182, 79}
+			jsonBytes, err := json.Marshal(gwanduke)
+
+			if err != nil {
+				panic(err)
+			}
+
+			jsonString := string(jsonBytes)
+
+			w.Header().Add("Content-Type", "application/json")
+			w.Write([]byte(jsonString))
+		case "POST":
+			var person Person
+			err := json.Unmarshal([]byte("{\"name\":\"gwanduke\"}"), &person)
+
+			if err != nil {
+				panic(err)
+			}
+
+			w.Header().Add("Content-Type", "application/text")
+			w.Write([]byte(person.Name))
+		case "PUT":
+			// Update an existing record.
+		case "DELETE":
+			// Remove the record.
+		default:
+			// Give an error message.
+		}
+	})
 
 	http.HandleFunc("/weather/", func(w http.ResponseWriter, r *http.Request) {
 		begin := time.Now()
