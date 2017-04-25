@@ -20,8 +20,16 @@ type Person struct {
 }
 
 var myLogger *log.Logger
+var myFileLogger *log.Logger
 
 func main() {
+	fpLog, err := os.OpenFile("gwanduke_log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer fpLog.Close()
+
+	myFileLogger = log.New(fpLog, "FILE_LOGGER: ", log.Ldate|log.Ltime|log.Lshortfile)
 	myLogger = log.New(os.Stdout, "GWANUKE_LOGGER: ", log.LstdFlags)
 
 	mw := multiWeatherProvider{
@@ -32,6 +40,8 @@ func main() {
 	http.HandleFunc("/post_test", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
+			myFileLogger.Println("GET Always Print to File.")
+
 			gwanduke := Person{"Kim Gwan-duk", 28, 182, 79}
 			jsonBytes, err := json.Marshal(gwanduke)
 
