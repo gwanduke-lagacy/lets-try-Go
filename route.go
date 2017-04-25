@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const weatherUndergroundAPIKey string = "964f63783709f6d0"
+
 // Person 사람
 type Person struct {
 	Name   string
@@ -32,7 +34,7 @@ func StartRoute() {
 	// Prepare
 	mwp := multiWeatherProvider{
 		openWeatherMap{},
-		weatherUnderground{apiKey: "964f63783709f6d0"},
+		weatherUnderground{apiKey: weatherUndergroundAPIKey},
 	}
 
 	WriteDoubleLogging(fpLog, "라우팅 시작")
