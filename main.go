@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"encoding/csv"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -24,6 +27,32 @@ var myLogger *log.Logger
 var myFileLogger *log.Logger
 
 func main() {
+	// Read CSV
+	file, _ := os.Open("public/test.csv")
+
+	rdr := csv.NewReader(bufio.NewReader(file))
+
+	rows, _ := rdr.ReadAll()
+
+	for i, row := range rows {
+		for j := range row {
+			fmt.Printf("%s ", rows[i][j])
+		}
+		fmt.Println()
+	}
+
+	// Write CSV
+	file, err := os.Create("gwanduke.csv")
+	if err != nil {
+		panic(err)
+	}
+
+	// CSV Writer 생성
+	wr := csv.NewWriter(bufio.NewWriter(file))
+
+	wr.Write([]string{"gwanduke", "success"})
+	wr.Write([]string{"gwanduke2", "double success"})
+	wr.Flush()
 
 	fpLog, err := os.OpenFile("gwanduke_log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
