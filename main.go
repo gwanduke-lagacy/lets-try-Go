@@ -74,3 +74,7 @@ type weatherData struct {
 		Kelvin float64 `json:"temp"`
 	} `json:"main"`
 }
+
+type weatherProvider interface {
+	temperature(city string) (float64, error) // in Kelvin, naturally
+}
