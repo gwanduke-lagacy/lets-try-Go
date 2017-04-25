@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -18,7 +19,11 @@ type Person struct {
 	Weight float64
 }
 
+var myLogger *log.Logger
+
 func main() {
+	myLogger = log.New(os.Stdout, "GWANUKE_LOGGER: ", log.LstdFlags)
+
 	mw := multiWeatherProvider{
 		openWeatherMap{},
 		weatherUnderground{apiKey: "964f63783709f6d0"},
@@ -36,6 +41,9 @@ func main() {
 
 			jsonString := string(jsonBytes)
 
+			// log.SetFlags(0)
+			log.Println("post_test GET invoked")
+
 			w.Header().Add("Content-Type", "application/json")
 			w.Write([]byte(jsonString))
 		case "POST":
@@ -45,6 +53,8 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
+
+			myLogger.Println("Custom Logger !")
 
 			w.Header().Add("Content-Type", "application/text")
 			w.Write([]byte(person.Name))
