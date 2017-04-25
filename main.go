@@ -1,11 +1,7 @@
 package main
 
 import (
-	"bufio"
-	"encoding/csv"
 	"encoding/json"
-	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -23,45 +19,20 @@ type Person struct {
 	Weight float64
 }
 
-var myLogger *log.Logger
-var myFileLogger *log.Logger
-
 func main() {
-	// Read CSV
-	file, _ := os.Open("public/test.csv")
+	// CSV
+	ReadCSV()
+	WriteCSV()
 
-	rdr := csv.NewReader(bufio.NewReader(file))
-
-	rows, _ := rdr.ReadAll()
-
-	for i, row := range rows {
-		for j := range row {
-			fmt.Printf("%s ", rows[i][j])
-		}
-		fmt.Println()
-	}
-
-	// Write CSV
-	file, err := os.Create("gwanduke.csv")
-	if err != nil {
-		panic(err)
-	}
-
-	// CSV Writer 생성
-	wr := csv.NewWriter(bufio.NewWriter(file))
-
-	wr.Write([]string{"gwanduke", "success"})
-	wr.Write([]string{"gwanduke2", "double success"})
-	wr.Flush()
-
-	fpLog, err := os.OpenFile("gwanduke_log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	// Loggers
+	fpLog, err := PrepareFileToLogging("tmp/gwanduke_log.txt")
 	if err != nil {
 		panic(err)
 	}
 	defer fpLog.Close()
 
-	myFileLogger = log.New(fpLog, "FILE_LOGGER: ", log.Ldate|log.Ltime|log.Lshortfile)
-	myLogger = log.New(os.Stdout, "GWANUKE_LOGGER: ", log.LstdFlags)
+	myFileLogger = log.New(fpLog, "MY_FILE_LOGGER: ", log.Ldate|log.Ltime|log.Lshortfile)
+	myStdLogger = log.New(os.Stdout, "STANDARD_LOGGER: ", log.LstdFlags)
 
 	mw := multiWeatherProvider{
 		openWeatherMap{},
@@ -69,9 +40,13 @@ func main() {
 	}
 
 	http.HandleFunc("/post_test", func(w http.ResponseWriter, r *http.Request) {
+	WriteDoubleLogging(fpLog, "라우팅 시작")
 		switch r.Method {
 		case "GET":
-			myFileLogger.Println("GET Always Print to File.")
+			myFileLogger.Println("GET 요청이 호출 되었습니다.")
+			myStdLogger.Println("GET 요청이 호출 되었습니다. (커스텀 로거)")
+			// log.SetFlags(0)
+			log.Println("GET 요청이 호출 되었습니다. (표준 로거)")
 
 			gwanduke := Person{"Kim Gwan-duk", 28, 182, 79}
 			jsonBytes, err := json.Marshal(gwanduke)
@@ -81,10 +56,6 @@ func main() {
 			}
 
 			jsonString := string(jsonBytes)
-
-			// log.SetFlags(0)
-			log.Println("post_test GET invoked")
-
 			w.Header().Add("Content-Type", "application/json")
 			w.Write([]byte(jsonString))
 		case "POST":
@@ -95,7 +66,6 @@ func main() {
 				panic(err)
 			}
 
-			myLogger.Println("Custom Logger !")
 
 			w.Header().Add("Content-Type", "application/text")
 			w.Write([]byte(person.Name))
@@ -139,10 +109,7 @@ func main() {
 	// http.Handle("/", new(testHandler))
 	http.Handle("/", http.FileServer(http.Dir("public")))
 
-	// 다중 로깅
-	multiWriter := io.MultiWriter(fpLog, os.Stdout)
-	log.SetOutput(multiWriter)
-	log.Println("---------- End of main ----------")
+	WriteDoubleLogging(fpLog, "라우팅 종료")
 
 	// 지정된 포트에 웹서버를 열고 클라이언트 Request를 받아들여 새 Go루틴에 작업 할당
 	// ListenAndServe(:포트, ServeMux(default: DefaultServeMux))
