@@ -4,6 +4,7 @@ func main() {
 	// ReadCSV()
 	// WriteCSV()
 	// StartRoute()
-	startLoopWebsocketRoute()
+	// startLoopWebsocketRoute()
+	simpleChatWebsocketRoute()
 	// runEchoWebsocketExample()
 }
