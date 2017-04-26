@@ -7,15 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func main() {
-	// ReadCSV()
-	// WriteCSV()
-	// StartRoute()
-
-	runWebsocketExample()
-}
-
-func runWebsocketExample() {
+func runEchoWebsocketExample() {
 	// -> https://jeremywho.com/simple-websocket-client-in-go-using-gorilla-websocket/
 	// http://www.websocket.org/echo.html
 	URL := "ws://echo.websocket.org"
@@ -58,5 +50,4 @@ func timeWriter(conn *websocket.Conn) {
 		// https://godoc.org/github.com/gorilla/websocket#Conn.WriteJSON
 		conn.WriteMessage(websocket.TextMessage, []byte(time.Now().Format("2006-01-02 15:04:05")))
 	}
-	// runEchoWebsocketExample()
 }
