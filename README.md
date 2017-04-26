@@ -1,8 +1,12 @@
-# Go Weather Site
+# Go Playground
+
 ## 개요
+> Repo
 - Author: letsget23@gmail.com (gwanduke)
 - Language: Go
 - Sub Language: HTML, CSS, JavaScript (jQuery)
+
+> Saying...
 ~~Go-lang 으로 작성한 날씨 조회 시스템입니다.~~
 
 처음 튜토리얼이 날씨조회 시스템이었는데,
@@ -10,8 +14,6 @@
 현재는 플레이그라운드!
 
 웹소켓 + API 통신으로 무언가 할것입니다~
-
----
 
 ## Usage
 ```
@@ -38,8 +40,6 @@
 - Websocket
 
 - 위 내용을 이용한 Examples
-
----
 
 ## References
 - 기초
