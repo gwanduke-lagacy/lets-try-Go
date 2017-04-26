@@ -2,18 +2,44 @@
 ## 개요
 - Author: letsget23@gmail.com (gwanduke)
 - Language: Go
-```
-Go-lang 으로 작성한 날씨 조회 시스템입니다.
-```
+- Sub Language: HTML, CSS, JavaScript (jQuery)
+~~Go-lang 으로 작성한 날씨 조회 시스템입니다.~~
 
-## References
-- [How i start Go](http://howistart.org/posts/go/1/index.html)
-- [HTTP Responses Snippets for Go](http://www.alexedwards.net/blog/golang-response-snippets)
-- [Making a RESTful JSON API in Go](https://thenewstack.io/make-a-restful-json-api-go/)
-- [예제로 배우는 GO 프로그래밍](http://golang.site/)
+처음 튜토리얼이 날씨조회 시스템이었는데,
+
+현재는 플레이그라운드!
+
+웹소켓 + API 통신으로 무언가 할것입니다~
+
+---
 
 ## Usage
 ```
-    $ go get letsget23/go-weather-site
-    $ go run main.go
+    $ go get letsget23/go-playground
+    $ go run *.go
 ```
+
+## 무엇이 있나요?
+- CSV Read/Write
+- Log (Stdout, File, ...)
+- HTTP 요청 (API call)
+- HTTP Route, Simple static file server
+- channel, go routine
+- Websocket
+
+- 위 내용을 이용한 Examples
+
+---
+
+## References
+- 기초
+    - [예제로 배우는 GO 프로그래밍](http://golang.site/)
+
+- API, HTTP
+    - [How i start Go](http://howistart.org/posts/go/1/index.html)
+    - [HTTP Responses Snippets for Go](http://www.alexedwards.net/blog/golang-response-snippets)
+    - [Making a RESTful JSON API in Go](https://thenewstack.io/make-a-restful-json-api-go/)
+
+- Websocket
+    - [Playing with websockets in Go](https://www.jonathan-petitcolas.com/2015/01/27/playing-with-websockets-in-go.html)
+    - [websocket ping-pong](http://arlimus.github.io/articles/gin.and.gorilla/)
