@@ -16,6 +16,16 @@
 ## Usage
 ```
     $ go get letsget23/go-playground
+    
+    - 주제별 분류되는 폴더는 복수형
+    - 실행가능한 루트 폴더는 단수
+    
+    # 프로젝트별 실행
+    $ cd projects/weather-man
+    $ go run *.go
+    
+    # 주제별 예제 실행
+    $ cd websockets/echo
     $ go run *.go
 ```
 
