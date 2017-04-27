@@ -53,3 +53,6 @@
 - Websocket
     - [Playing with websockets in Go](https://www.jonathan-petitcolas.com/2015/01/27/playing-with-websockets-in-go.html)
     - [websocket ping-pong](http://arlimus.github.io/articles/gin.and.gorilla/)
+
+- Project 구성
+    - [mingrammer/make-restful-api-with-go](https://speakerdeck.com/mingrammer/make-restful-api-with-go)
