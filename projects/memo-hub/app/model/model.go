@@ -2,12 +2,12 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // Memo .
 type Memo struct {
-	gorm.Model
-	ID   int64  `gorm:"unique" json:"id"`
+	ID   uint
 	Body string `json:"body"`
 }
 

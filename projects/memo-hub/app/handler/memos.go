@@ -52,7 +52,7 @@ func DeleteMemo(db *gorm.DB, w http.ResponseWriter, r *http.Request) {
 }
 
 // getMemoOr404 .
-func getMemoOr404(db *gorm.DB, id int64, w http.ResponseWriter, r *http.Request) *model.Memo {
+func getMemoOr404(db *gorm.DB, id uint, w http.ResponseWriter, r *http.Request) *model.Memo {
 	memo := model.Memo{}
 	if err := db.First(&memo, model.Memo{ID: id}).Error; err != nil {
 		respondError(w, http.StatusNotFound, err.Error())
