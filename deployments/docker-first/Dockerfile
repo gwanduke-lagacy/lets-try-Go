@@ -1,0 +1,14 @@
+# 튜토리얼의 1.6 대신 최신버전인 1.8을 선택한다.
+# $GOPATH 는 /go 로 설정되어 있으며
+# 모든 패키지는 /go/src 에 설치되며 go 명령으로 접근가능하다.
+FROM golang:1.8
+
+# Install beego and the bee dev tool
+RUN go get github.com/astaxie/beego && go get github.com/beego/bee
+
+# Expose the application on port 8080
+EXPOSE 8080
+
+# Set the entry point of the container to the bee command that runs the
+# application and watches for changes
+CMD ["bee", "run"]
